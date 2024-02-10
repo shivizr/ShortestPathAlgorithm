@@ -180,13 +180,32 @@ public class Main {
         ActiveStack.add(intervals.get(0));
         for (int i = 1 ; i<intervals.size() ; i++){
             if(!Find(intervals.get(i).Successor).inActiveStack)
-                Union(Find(intervals.get(i).Successor),intervals.get(i).Successor);
+                Union(Find(intervals.get(i).Successor),intervals.get(i));
             else if (Find(intervals.get(i).Successor).inActiveStack) {
-//                intervals.get(i).size+=intervals.get()
+                intervals.get(i).weightsize=intervals.get(i).Weight+Find(intervals.get(i).Successor).Parent.weightsize;
+                while (intervals.get(i).weightsize<ActiveStack.get(ActiveStack.size()-1).weightsize){
+                    Union(intervals.get(i),ActiveStack.get(ActiveStack.size()-1));
+                    ActiveStack.remove(ActiveStack.size()-1);
+                    Find(intervals.get(i)).Parent=intervals.get(i);
+                }
+                while (!SpecialInactiveStack.isEmpty()){
+                    Union(intervals.get(i) , SpecialInactiveStack.get(SpecialInactiveStack.size()-1));
+                    SpecialInactiveStack.remove(SpecialInactiveStack.size()-1);
+                }
             } else if (Find(intervals.get(i).Successor)==intervals.get(i)) {
                 intervals.get(i).inActiveStack = false;
-                ActiveStack.add(intervals.get(i));
+                SpecialInactiveStack.add(intervals.get(i));
             }
+        }
+        for (Interval interval : intervals) {
+            if (interval.weightsize == -1 && Find(interval).Parent != null) {
+                interval.weightsize = interval.Weight + Find(interval).Parent.weightsize;
+            }
+        }
+        int counterPrint = 1;
+        for (Interval interval : intervals) {
+            System.out.println(counterPrint + " " + interval.weightsize);
+            counterPrint++;
         }
     }
 }
