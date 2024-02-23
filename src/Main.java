@@ -19,15 +19,17 @@ public class Main {
         Interval Parent;
         int size;
         int weightsize;
-        boolean inActiveStack=false;
+        boolean inActiveStack = false;
+
         public Interval(int Start, int End, int Weight) {
             this.StartPoint = Start;
             this.EndPoint = End;
             this.Weight = Weight;
             this.size = 1;
-            this.weightsize=-1;
+            this.weightsize = -1;
         }
     }
+
     public static class sortedIntervalsList {
         int point;
         Interval interval;
@@ -39,6 +41,7 @@ public class Main {
             this.side = side;
         }
     }
+
     public static ArrayList<Interval> readIntervals(String filePath) throws IOException {
         ArrayList<Interval> intervals = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
@@ -55,6 +58,7 @@ public class Main {
         }
         return intervals;
     }
+
     public static void bucketSortIntervalsByEnd(ArrayList<Interval> intervals) {
         int minEndPoint = intervals.stream().min(Comparator.comparingInt(i -> i.EndPoint)).orElseThrow().EndPoint;
         int maxEndPoint = intervals.stream().max(Comparator.comparingInt(i -> i.EndPoint)).orElseThrow().EndPoint;
@@ -76,6 +80,7 @@ public class Main {
             }
         }
     }
+
     public static void insertionSort(List<Interval> intervals) {
         for (int i = 1; i < intervals.size(); i++) {
             Interval key = intervals.get(i);
@@ -87,6 +92,7 @@ public class Main {
             intervals.set(j + 1, key);
         }
     }
+
     public static void sortSortedIntervalsList() {
         int minPoint = sortedList.stream().min(Comparator.comparingInt(i -> i.point)).orElseThrow().point;
         int maxPoint = sortedList.stream().max(Comparator.comparingInt(i -> i.point)).orElseThrow().point;
@@ -106,6 +112,7 @@ public class Main {
             sortedList.addAll(bucket);
         }
     }
+
     public static void bucketInsertionSort(List<sortedIntervalsList> bucket) {
         for (int i = 1; i < bucket.size(); i++) {
             sortedIntervalsList key = bucket.get(i);
@@ -118,8 +125,9 @@ public class Main {
             bucket.set(j + 1, key);
         }
     }
+
     public static void Successor(ArrayList<Interval> intervals) {
-        Interval successor = sortedList.get(sortedList.size()-1).interval;
+        Interval successor = sortedList.get(sortedList.size() - 1).interval;
         for (int i = sortedList.size() - 1; i >= 0; i--) {
             if (sortedList.get(i).side) {
                 sortedList.get(i).interval.Successor = successor;
@@ -128,28 +136,33 @@ public class Main {
             }
         }
     }
+
     public static Interval Find(Interval interval) {
         if (interval.Parent != interval) {
             interval.Parent = Find(interval.Parent);
         }
         return interval.Parent;
     }
+
     static boolean Union(Interval x, Interval y) {
         Interval rootX = Find(x);
         Interval rootY = Find(y);
         if (rootY == rootX) return false;
         if (rootX.size < rootY.size) {
-            rootX.Parent = rootY;
-            rootY.size += rootX.size;
-        } else {
-            rootY.Parent = rootX;
-            rootX.size += rootY.size;
+            Interval temp = rootX;
+            rootX = rootY;
+            rootY = temp;
         }
+        rootY.Parent = rootX;
+        rootX.size =rootX.size+ rootY.size;
         return true;
     }
+
     public static void main(String[] args) throws IOException {
-        String filePath = "C:/Users/Tarahan IT/OneDrive/Desktop/Ds.txt";
+        System.out.println("Enter file path:");
+        String filePath = scanner.nextLine();
         intervals = readIntervals(filePath);
+        // if you want to read it from terminal
 //        int num = scanner.nextInt();
 //        scanner.nextLine();
 //        for (int i = 0; i < num; i++) {
@@ -167,8 +180,8 @@ public class Main {
             sortedList.add(new sortedIntervalsList(interval.StartPoint, interval, true));
             sortedList.add(new sortedIntervalsList(interval.EndPoint, interval, false));
         }
-        for (Interval interval : intervals){
-            interval.Parent=interval;
+        for (Interval interval : intervals) {
+            interval.Parent = interval;
             parentsList.add(interval);
         }
         sortSortedIntervalsList();
@@ -176,29 +189,31 @@ public class Main {
         for (Interval interval : intervals) {
             System.out.println(interval.Successor.StartPoint);
         }
-        intervals.get(0).weightsize=intervals.get(0).Weight;
+        intervals.get(0).weightsize = intervals.get(0).Weight;
         ActiveStack.add(intervals.get(0));
-        for (int i = 1 ; i<intervals.size() ; i++){
-            if(!Find(intervals.get(i).Successor).inActiveStack)
-                Union(Find(intervals.get(i).Successor),intervals.get(i));
-            else if (Find(intervals.get(i).Successor).inActiveStack) {
-                intervals.get(i).weightsize=intervals.get(i).Weight+Find(intervals.get(i).Successor).Parent.weightsize;
-                while (intervals.get(i).weightsize<ActiveStack.get(ActiveStack.size()-1).weightsize){
-                    Union(intervals.get(i),ActiveStack.get(ActiveStack.size()-1));
-                    ActiveStack.remove(ActiveStack.size()-1);
-                    Find(intervals.get(i)).Parent=intervals.get(i);
-                }
-                while (!SpecialInactiveStack.isEmpty()){
-                    Union(intervals.get(i) , SpecialInactiveStack.get(SpecialInactiveStack.size()-1));
-                    SpecialInactiveStack.remove(SpecialInactiveStack.size()-1);
-                }
-            } else if (Find(intervals.get(i).Successor)==intervals.get(i)) {
+        intervals.get(0).inActiveStack = true;
+        for (int i = 1; i < intervals.size(); i++) {
+            if (Find(intervals.get(i).Successor) == intervals.get(i)) {
                 intervals.get(i).inActiveStack = false;
                 SpecialInactiveStack.add(intervals.get(i));
-            }
+            } else if (Find(intervals.get(i).Successor).inActiveStack) {
+                intervals.get(i).weightsize = intervals.get(i).Weight + Find(intervals.get(i).Successor).Parent.weightsize;
+                while (intervals.get(i).weightsize < ActiveStack.get(ActiveStack.size() - 1).weightsize) {
+                    Union(intervals.get(i), ActiveStack.get(ActiveStack.size() - 1));
+                    ActiveStack.remove(ActiveStack.size() - 1);
+                    Find(intervals.get(i)).Parent = intervals.get(i);
+                }
+                while (!SpecialInactiveStack.isEmpty()) {
+                    Union(intervals.get(i), SpecialInactiveStack.get(SpecialInactiveStack.size() - 1));
+                    SpecialInactiveStack.remove(SpecialInactiveStack.size() - 1);
+                }
+                ActiveStack.add(intervals.get(i));
+
+            } else if (!Find(intervals.get(i).Successor).inActiveStack)
+                Union(Find(intervals.get(i).Successor), intervals.get(i));
         }
         for (Interval interval : intervals) {
-            if (interval.weightsize == -1 && Find(interval).Parent != null) {
+            if (interval.weightsize == -1 && Find(interval).Parent != interval && !SpecialInactiveStack.contains(interval.Parent)) {
                 interval.weightsize = interval.Weight + Find(interval).Parent.weightsize;
             }
         }
