@@ -127,7 +127,7 @@ public class Main {
     }
 
     public static void Successor(ArrayList<Interval> intervals) {
-        Interval successor = sortedList.get(sortedList.size() - 1).interval;
+        Interval successor = sortedList.get(sortedList.size()-1).interval;
         for (int i = sortedList.size() - 1; i >= 0; i--) {
             if (sortedList.get(i).side) {
                 sortedList.get(i).interval.Successor = successor;
@@ -186,9 +186,9 @@ public class Main {
         }
         sortSortedIntervalsList();
         Successor(intervals);
-        for (Interval interval : intervals) {
-            System.out.println(interval.Successor.StartPoint);
-        }
+//        for (Interval interval : intervals) {
+//            System.out.println(interval.Successor.StartPoint);
+//        }
         intervals.get(0).weightsize = intervals.get(0).Weight;
         ActiveStack.add(intervals.get(0));
         intervals.get(0).inActiveStack = true;
@@ -217,10 +217,8 @@ public class Main {
                 interval.weightsize = interval.Weight + Find(interval).Parent.weightsize;
             }
         }
-        int counterPrint = 1;
         for (Interval interval : intervals) {
-            System.out.println(counterPrint + " " + interval.weightsize);
-            counterPrint++;
+            System.out.println((intervals.indexOf(interval)+1) + " " + interval.weightsize);
         }
     }
 }
